@@ -1,39 +1,24 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "nexhire-frontend",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@fortawesome/fontawesome-svg-core": "^6.6.0",
-    "@fortawesome/free-brands-svg-icons": "^6.6.0",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mui/material": "^6.0.1",
     "@reduxjs/toolkit": "^2.2.7",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "animate.css": "^4.1.1",
-    "autoprefixer": "^10.4.20",
     "axios": "^1.7.6",
-    "bootstrap": "^5.3.3",
-    "browser-image-compression": "^2.0.2",
-    "notistack": "^3.0.1",
-    "postcss": "^8.4.41",
     "react": "^18.3.1",
-    "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
+    "react-hot-toast": "^2.4.1",
     "react-icons": "^5.3.0",
-    "react-js-pagination": "^3.0.3",
     "react-redux": "^9.1.2",
     "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
-    "redux": "^5.0.1",
-    "redux-devtools-extension": "^2.13.9",
-    "redux-persist": "^6.0.0",
-    "redux-thunk": "^3.1.0",
     "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,30 +27,18 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": ["react-app"]
   },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
+    "production": [">0.2%", "not dead", "not op_mini all"],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
     ]
   },
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
+  "description": "NexHire frontend — React + Redux Toolkit + Tailwind",
+  "author": "Debasish Rana",
   "license": "ISC",
-  "devDependencies": {
-    "tailwindcss": "^3.4.10"
-  },
   "proxy": "http://localhost:4000"
 }

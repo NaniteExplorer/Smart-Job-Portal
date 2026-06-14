@@ -1,35 +1,28 @@
-const sendToken = (student, statusCode, res) => {
-  // Validate the student object and method
-  if (!student || typeof student.getJWTToken !== "function") {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid student object or getJWTToken method not found.",
-    });
-  }
+/**
+ * Issues a JWT, stores it in an httpOnly cookie, and returns a sanitised user.
+ * Works for any role since auth is unified on the User model.
+ */
+const sendToken = (user, statusCode, res) => {
+  const token = user.getJWTToken();
 
-  const token = student.getJWTToken();
+  const cookieExpire = parseInt(process.env.COOKIE_EXPIRE, 10) || 7;
 
-  // Ensure COOKIE_EXPIRE is a valid number
-  const cookieExpire = parseInt(process.env.COOKIE_EXPIRE, 10);
-  if (isNaN(cookieExpire)) {
-    return res.status(500).json({
-      success: false,
-      message: "Invalid COOKIE_EXPIRE value in environment variables.",
-    });
-  }
-
-  // Options for cookies
   const options = {
-    expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + cookieExpire * 24 * 60 * 60 * 1000),
     httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   };
 
-  // Send response with token cookie
+  // Never leak the password hash, even though `select: false` should cover it.
+  const safeUser = user.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
+  delete safeUser.resetPasswordToken;
+  delete safeUser.resetPasswordExpire;
+
   res.status(statusCode).cookie("token", token, options).json({
     success: true,
-    student,
+    user: safeUser,
     token,
   });
 };

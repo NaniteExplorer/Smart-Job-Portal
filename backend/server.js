@@ -1,34 +1,40 @@
-import app from "./app.js";
-
-import colors from "colors";
 import dotenv from "dotenv";
+dotenv.config({ path: "backend/config/config.env" });
+
+import app from "./app.js";
 import ConnectDatabase from "./config/database.js";
 import cloudinary from "cloudinary";
 
-// Handling Uncaught Exception
+// Crash early on programmer errors.
 process.on("uncaughtException", (err) => {
-  console.log(`Error: ${err.message}`);
-  console.log(`Shutting Down the Server due to Uncaught Exception`);
+  console.error(`Uncaught Exception: ${err.message}`);
+  console.error("Shutting down due to uncaught exception");
   process.exit(1);
 });
 
-// Config
+// Validate required env vars at boot — fail loud, not at request time.
+const required = ["DB_URI", "JWT_SECRET"];
+const missing = required.filter((k) => !process.env[k]);
+if (missing.length) {
+  console.error(`Missing required env vars: ${missing.join(", ")}`);
+  process.exit(1);
+}
 
-dotenv.config({ path: "config/config.env" });
-
-cloudinary.config({
+cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Connecting Database
 ConnectDatabase();
 
-const server = app.listen(process.env.PORT, () => {
-  console.log(
-    colors.bgMagenta.white(
-      `Server is working on http://localhost:${process.env.PORT}`
-    )
-  );
+const PORT = process.env.PORT || 4000;
+const server = app.listen(PORT, () => {
+  console.log(`NexHire API running on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown on unhandled promise rejections.
+process.on("unhandledRejection", (err) => {
+  console.error(`Unhandled Rejection: ${err.message}`);
+  server.close(() => process.exit(1));
 });

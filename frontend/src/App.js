@@ -1,82 +1,91 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import Header from "./Components/layout/Header/Header.js";
-import "./index.css";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loadUser } from "./store/authSlice";
 
-import "./App.css";
+import Header from "./Components/layout/Header";
+import Footer from "./Components/layout/Footer";
+import ScrollToTop from "./Components/layout/ScrollToTop";
+import ProtectedRoute from "./Components/Route/ProtectedRoute";
 
-import StudentSignupPage from "./Components/Authentication/studentSignupPage.jsx";
-import UniversitySignupPage from "./Components/Authentication/universitySignupPage.jsx";
-import RecruiterSignupPage from "./Components/Authentication/recruiterSignupPage.jsx";
-import LoginPage from "./Components/Authentication/LoginPage.jsx";
-import Home from "./Components/Home/Home.js";
-import Footer from "./Components/layout/Footer.js";
-import Loader from "./Components/layout/Loader/Loader.js";
-import PageNotFound from "./Components/layout/PageNotFound.js";
-import AllJobs from "./Components/Home/AllJobs.js";
-import ProtectedRoute from "./Components/Route/ProtectedRoutes.js";
-import StudentProfile from "./Components/Pages/Student/StudentProfile.js";
-import UniversityProfile from "./Components/Pages/University/universityProfile.js";
-import EmployerProfile from "./Components/Pages/Recruiter/employerProfile.js";
-import About from "./Components/Pages/about.js";
-import Contact from "./Components/Pages/contact.js";
-import CreateJob from "./Components/Pages/Recruiter/createJob.js";
-import JobDescription from "./Components/Home/Job/jobDescription.js";
+import Home from "./Components/Home/Home";
+import Jobs from "./Components/Jobs/Jobs";
+import JobDetails from "./Components/Jobs/JobDetails";
+import Events from "./Components/Events/Events";
+import EventDetails from "./Components/Events/EventDetails";
+import Login from "./Components/Auth/Login";
+import Signup from "./Components/Auth/Signup";
+import Dashboard from "./Components/Dashboard/Dashboard";
+import Profile from "./Components/Profile/Profile";
+import EditProfile from "./Components/Profile/EditProfile";
+import MyApplications from "./Components/Student/MyApplications";
+import SavedJobs from "./Components/Student/SavedJobs";
+import ManageJobs from "./Components/Recruiter/ManageJobs";
+import JobApplicants from "./Components/Recruiter/JobApplicants";
+import JobForm from "./Components/Recruiter/JobForm";
+import ManageEvents from "./Components/Host/ManageEvents";
+import EventForm from "./Components/Host/EventForm";
+import About from "./Components/Pages/About";
+import Contact from "./Components/Pages/Contact";
+import NotFound from "./Components/layout/NotFound";
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(loadUser());
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <Router>
+    <BrowserRouter>
+      <ScrollToTop />
+      <div className="flex min-h-screen flex-col">
         <Header />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/:id" element={<JobDetails />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<EventDetails />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
 
-        <Routes>
-          <Route
-            path="/student/profile"
-            element={
-              <ProtectedRoute element={StudentProfile} userType="student" />
-            }
-          />
-          <Route
-            path="/university/profile"
-            element={
-              <ProtectedRoute
-                element={UniversityProfile}
-                userType="university"
-              />
-            }
-          />
-          <Route
-            path="/employer/profile"
-            element={
-              <ProtectedRoute element={EmployerProfile} userType="employer" />
-            }
-          />
-          <Route
-            path="/employer/profile/createJob"
-            element={<ProtectedRoute element={CreateJob} userType="employer" />}
-          />
-          <Route path="/jobs" element={<AllJobs />} />
-          <Route path="/universitysignup" element={<UniversitySignupPage />} />
-          <Route path="/studentsignup" element={<StudentSignupPage />} />
-          <Route path="/recruitersignup" element={<RecruiterSignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/Home" element={<Home />} />
-          <Route path="/load" element={<Loader />} />
-          <Route path="*" element={<PageNotFound />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/job/:id" element={<JobDescription />} />
-          {/* <Route path="/jobs" element={<AllJobs />} /> */}
+            {/* Authenticated — any role */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/edit" element={<EditProfile />} />
+            </Route>
 
-          <Route path="/" element={<Navigate to="/home" />} />
-        </Routes>
+            {/* Student only */}
+            <Route element={<ProtectedRoute roles={["student"]} />}>
+              <Route path="/applications" element={<MyApplications />} />
+              <Route path="/saved" element={<SavedJobs />} />
+            </Route>
+
+            {/* Recruiter only */}
+            <Route element={<ProtectedRoute roles={["recruiter"]} />}>
+              <Route path="/recruiter/jobs" element={<ManageJobs />} />
+              <Route path="/recruiter/jobs/new" element={<JobForm />} />
+              <Route path="/recruiter/jobs/:id/edit" element={<JobForm />} />
+              <Route path="/recruiter/jobs/:id/applicants" element={<JobApplicants />} />
+            </Route>
+
+            {/* Host — recruiter or university */}
+            <Route element={<ProtectedRoute roles={["recruiter", "university"]} />}>
+              <Route path="/host/events" element={<ManageEvents />} />
+              <Route path="/host/events/new" element={<EventForm />} />
+            </Route>
+
+            <Route path="/home" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
         <Footer />
-      </Router>
-    </div>
+      </div>
+    </BrowserRouter>
   );
 }
 

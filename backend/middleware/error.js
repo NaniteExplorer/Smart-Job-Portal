@@ -4,34 +4,38 @@ const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal Server Error";
 
-  // Wrong MongoDB id error
+  // Invalid MongoDB ObjectId
   if (err.name === "CastError") {
-    const message = `Resource not found. Invalid: ${err.path}`;
-    err = new ErrorHandler(message, 400);
+    err = new ErrorHandler(`Resource not found. Invalid: ${err.path}`, 400);
   }
 
-  // Mongoose duplicate key error
+  // Duplicate key (e.g. email already registered)
   if (err.code === 11000) {
-    const message = `Duplicate ${Object.keys(err.keyValue)} entered`;
+    const field = Object.keys(err.keyValue || {})[0] || "field";
+    err = new ErrorHandler(`This ${field} is already registered`, 409);
+  }
+
+  // Mongoose validation errors
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors)
+      .map((e) => e.message)
+      .join(", ");
     err = new ErrorHandler(message, 400);
   }
 
-  // Wrong JWT error
+  // JWT errors
   if (err.name === "JsonWebTokenError") {
-    const message = "Json Web Token is invalid, try again";
-    err = new ErrorHandler(message, 400);
+    err = new ErrorHandler("Invalid authentication token, please log in again", 401);
   }
-
-  // JWT expire error
   if (err.name === "TokenExpiredError") {
-    const message = "Json Web Token is expired, try again";
-    err = new ErrorHandler(message, 400);
+    err = new ErrorHandler("Session expired, please log in again", 401);
   }
 
-  res.status(err.statusCode).json({
-    success: false,
-    message: err.message,
-  });
+  const payload = { success: false, message: err.message };
+  // Surface stack traces only in development.
+  if (process.env.NODE_ENV !== "production") payload.stack = err.stack;
+
+  res.status(err.statusCode).json(payload);
 };
 
 export default errorHandler;

@@ -1,32 +1,41 @@
 {
-  "name": "job-portal",
+  "name": "nexhire",
   "version": "1.0.0",
   "type": "module",
   "main": "backend/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "server": "nodemon backend/server.js",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently --names \"API,WEB\" --prefix-colors \"magenta,cyan\" \"npm run server\" \"npm run client\"",
+    "install:all": "npm install && npm install --prefix frontend",
+    "seed": "node backend/seeder/seed.js",
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "author": "",
+  "author": "Debasish Rana",
   "license": "ISC",
+  "description": "NexHire — a campus-to-career platform bridging students, colleges and recruiters.",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.0",
-    "colors": "^1.4.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
-    "crypto": "^1.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-fileupload": "^1.5.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.8.0",
     "mongoose": "^8.5.4",
+    "morgan": "^1.10.0",
     "validator": "^13.12.0"
   },
   "devDependencies": {
+    "concurrently": "^9.0.1",
     "nodemon": "^3.1.4"
   },
-  "keywords": [],
-  "description": ""
+  "keywords": ["job-portal", "mern", "nexhire", "careers", "hackathons"]
 }

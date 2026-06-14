@@ -1,12 +1,10 @@
-import React from "react";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet";
 
-const MetaData = ({ title }) => {
-  return (
-    <Helmet>
-      <title> {title} </title>
-    </Helmet>
-  );
-};
+const MetaData = ({ title, description }) => (
+  <Helmet>
+    <title>{title ? `${title} · NexHire` : "NexHire"}</title>
+    {description && <meta name="description" content={description} />}
+  </Helmet>
+);
 
 export default MetaData;
